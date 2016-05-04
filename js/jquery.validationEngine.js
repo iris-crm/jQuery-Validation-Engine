@@ -362,7 +362,7 @@
 				if ($.inArray(field.attr('name'), names) < 0) {
 					errorFound |= methods._validateField(field, options);
 					if (errorFound && first_err==null)
-						if (field.is(":hidden") && options.prettySelect)
+						if (field.is("select:hidden") && options.prettySelect)
 							first_err = field = form.find("#" + options.usePrefix + methods._jqSelector(field.attr('id')) + options.useSuffix);
 						else {
 
@@ -548,7 +548,13 @@
 			if(field.hasClass(options.ignoreFieldsWithClass))
 				return false;
 
-           if (!options.validateNonVisibleFields && (field.is(":hidden") && !options.prettySelect || field.parent().is(":hidden")))
+			// Not validate hidden fields
+		   if (!options.validateNonVisibleFields && field.not("select").is(":hidden") )
+				return false;
+
+			var prettySelectElement = $("#" + options.usePrefix + methods._jqSelector(field.attr('id')) + options.useSuffix);
+			// Not validate hidden pretty select elements
+			if (field.is("select:hidden") && (!options.prettySelect || (options.prettySelect && prettySelectElement && prettySelectElement.is(":hidden"))))
 				return false;
 
 			var rulesParsing = field.attr(options.validateAttribute);
@@ -1856,7 +1862,6 @@
 		* @return positions
 		*/
 		_calculatePosition: function (field, promptElmt, options) {
-
 			var promptTopPosition, promptleftPosition, marginTopSize;
 			var fieldWidth 	= field.width();
 			var fieldLeft 	= field.position().left;
